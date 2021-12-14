@@ -1,25 +1,53 @@
-import logo from './logo.svg';
-import './App.css';
+import { useCallback, useEffect, useState, useRef } from 'react';
+import { getYearsArr, monthsArr, Calendar as CalendarClass } from './calendar';
+import Select from './components/Select';
+import Calendar from './components/Calendar';
 
-function App() {
+const yearsArr = getYearsArr();
+
+const date = new Date();
+const currentYear = date.getFullYear();
+const currentMonth = date.getMonth();
+
+const App = () => {
+  const [year, setYear] = useState(currentYear);
+  const [month, setMonth] = useState(monthsArr[currentMonth]);
+
+  const [data, setData] = useState(new CalendarClass(year, monthsArr.indexOf(month)));
+
+  const handleYearSelect = useCallback((val) => setYear(Number(val)), []);
+
+  const handleMonthSelect = useCallback((val) => setMonth(val), []);
+
+  const initial = useRef(true);
+
+  useEffect(() => {
+    if (initial.current) {
+      initial.current = false;
+      return;
+    }
+    setData(new CalendarClass(year, monthsArr.indexOf(month)));
+  }, [year, month]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='container'>
+      <div className='selects'>
+        <Select
+          data={yearsArr}
+          defaultValue={year}
+          title='Select Year'
+          handleSelect={handleYearSelect}
+        />
+        <Select
+          data={monthsArr}
+          defaultValue={month}
+          title='Select Month'
+          handleSelect={handleMonthSelect}
+        />
+      </div>
+      <Calendar data={data} />
     </div>
   );
-}
+};
 
 export default App;
